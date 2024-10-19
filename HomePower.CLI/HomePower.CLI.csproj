@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HomePower.GivEnergi\HomePower.GivEnergi.csproj" />
-    <ProjectReference Include="..\HomePower.MyEnergy\HomePower.MyEnergy.csproj" />
+    <ProjectReference Include="..\HomePower.GivEnergy\HomePower.GivEnergy.csproj" />
+    <ProjectReference Include="..\HomePower.MyEnergi\HomePower.MyEnergi.csproj" />
   </ItemGroup>
 
 </Project>

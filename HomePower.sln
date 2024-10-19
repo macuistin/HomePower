@@ -5,14 +5,20 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomePower.CLI", "HomePower.CLI\HomePower.CLI.csproj", "{280570BA-EA5D-4344-AA80-859439AFCD29}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomePower.MyEnergy", "HomePower.MyEnergy\HomePower.MyEnergy.csproj", "{3CC9F0E4-F03A-45EC-822C-DADEA6EE57CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomePower.MyEnergi", "HomePower.MyEnergi\HomePower.MyEnergi.csproj", "{3CC9F0E4-F03A-45EC-822C-DADEA6EE57CB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{A7FC0176-66B6-43A1-8587-534A4DA63AD7}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomePower.GivEnergi", "HomePower.GivEnergi\HomePower.GivEnergi.csproj", "{21C00FBE-842D-44A5-BBC6-B05C8EC1F967}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomePower.GivEnergy", "HomePower.GivEnergy\HomePower.GivEnergy.csproj", "{21C00FBE-842D-44A5-BBC6-B05C8EC1F967}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{793BF97E-DCBB-4F8A-9248-A69BE44880BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomePower.GivEnergy.UnitTests", "Tests\HomePower.GivEnergy.UnitTests\HomePower.GivEnergy.UnitTests.csproj", "{5E60BB3F-2C7B-4469-A96F-D1A9EDA6D9E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomePower.MyEnergi.UnitTests", "Tests\HomePower.MyEnergi.UnitTests\HomePower.MyEnergi.UnitTests.csproj", "{39D17848-C02D-4DED-941A-9BA2CC64C68C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,9 +38,21 @@ Global
 		{21C00FBE-842D-44A5-BBC6-B05C8EC1F967}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21C00FBE-842D-44A5-BBC6-B05C8EC1F967}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21C00FBE-842D-44A5-BBC6-B05C8EC1F967}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E60BB3F-2C7B-4469-A96F-D1A9EDA6D9E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E60BB3F-2C7B-4469-A96F-D1A9EDA6D9E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E60BB3F-2C7B-4469-A96F-D1A9EDA6D9E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E60BB3F-2C7B-4469-A96F-D1A9EDA6D9E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39D17848-C02D-4DED-941A-9BA2CC64C68C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39D17848-C02D-4DED-941A-9BA2CC64C68C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39D17848-C02D-4DED-941A-9BA2CC64C68C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39D17848-C02D-4DED-941A-9BA2CC64C68C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5E60BB3F-2C7B-4469-A96F-D1A9EDA6D9E5} = {793BF97E-DCBB-4F8A-9248-A69BE44880BE}
+		{39D17848-C02D-4DED-941A-9BA2CC64C68C} = {793BF97E-DCBB-4F8A-9248-A69BE44880BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D1375634-6D47-4890-BCBE-23FB8DEB9409}
