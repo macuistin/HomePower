@@ -27,7 +27,7 @@ public class MyEnergiService(HttpClient _httpClient) : IMyEnergiService
     }
 
     /// <inheritdoc/>
-    public async Task<EvChargeStatus> GetEvChargeStatus()
+    public async Task<EvChargeStatus> GetEvChargeStatusAsync()
     {
         var zappiStatus = await GetZappiStatusAsync();
 

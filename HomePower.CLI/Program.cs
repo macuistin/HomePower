@@ -35,7 +35,7 @@ Console.WriteLine("\nEV Charger Status");
 Console.WriteLine("=================");
 for (int i = 0; i < 10; i++)
 {
-    var evChargeStatus = myEnergiService!.GetEvChargeStatus().Result;
+    var evChargeStatus = myEnergiService!.GetEvChargeStatusAsync().Result;
     Console.Write($"\r {DateTime.Now:HH:mm:ss} {evChargeStatus}   ");
     Thread.Sleep(2000);
 }

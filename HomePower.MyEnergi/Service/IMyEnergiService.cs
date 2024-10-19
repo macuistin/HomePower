@@ -17,5 +17,5 @@ public interface IMyEnergiService
     /// Gets the status of the electric vehicle charge asynchronously.
     /// </summary>
     /// <returns>A <see cref="EvChargeStatus"/> containing the status of the electric vehicle charge.</returns>
-    Task<EvChargeStatus> GetEvChargeStatus();
+    Task<EvChargeStatus> GetEvChargeStatusAsync();
 }

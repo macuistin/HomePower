@@ -76,7 +76,7 @@ public class MyEnergiServiceTests
         var service = CreateService();
 
         // Act
-        var result = await service.GetEvChargeStatus();
+        var result = await service.GetEvChargeStatusAsync();
 
         // Assert
         Assert.NotEqual(EvChargeStatus.Failed, result);
@@ -91,7 +91,7 @@ public class MyEnergiServiceTests
         var service = CreateService();
 
         // Act
-        var result = await service.GetEvChargeStatus();
+        var result = await service.GetEvChargeStatusAsync();
 
         // Assert
         Assert.Equal(EvChargeStatus.Failed, result);
