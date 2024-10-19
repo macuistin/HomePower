@@ -27,7 +27,7 @@ public record EvChargeStatus
 
     public override string ToString()
     {
-        return $"ChargeAddedKWh: {ChargeAddedKWh}, ChargeRateWatts: {ChargeRateWatts}, ChargerStatus: {ChargerStatus}, ChargingStatus: {ChargingStatus}, LockStatus: {LockStatus}, ZappiMode: {ZappiMode}";
+        return $"Added:{ChargeAddedKWh}KWh, Rate:{ChargeRateWatts}W, Charger:{ChargerStatus}, Charging:{ChargingStatus}, Mode:{ZappiMode}, Lock:{LockStatus}";
     }
 
 }

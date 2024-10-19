@@ -27,8 +27,16 @@ var acChargeEnabled = givEnergyService.GetACChargeEnabledAsync().Result;
 var chargeStartTime = givEnergyService.GetBatteryChargeStartTimeAsync().Result;
 var chargeEndTime = givEnergyService.GetBatteryChargeEndTimeAsync().Result;
 
-var myEnergiService = sp.GetService<IMyEnergiService>();
-var evChargeStatus = myEnergiService!.GetEvChargeStatus().Result;
-
-Console.WriteLine($"Charging Status\n: {evChargeStatus}");
 Console.WriteLine($"House Battery Charger\n Enabled: {acChargeEnabled}, Start: {chargeStartTime}, End: {chargeEndTime}");
+
+var myEnergiService = sp.GetService<IMyEnergiService>();
+
+Console.WriteLine("\nEV Charger Status");
+Console.WriteLine("=================");
+for (int i = 0; i < 10; i++)
+{
+    var evChargeStatus = myEnergiService!.GetEvChargeStatus().Result;
+    Console.Write($"\r {DateTime.Now:HH:mm:ss} {evChargeStatus}   ");
+    Thread.Sleep(2000);
+}
+Console.WriteLine("\nDone");
