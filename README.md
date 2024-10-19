@@ -35,13 +35,12 @@ MyEnergi API is used to control the Zappi EV charger.
 GivEnergy API is used to manage my House inverter, solar and battery.
 - https://portal.givenergy.cloud/account-settings/api-tokens (If you have an account, get your API token here)
 - https://portal.givenergy.cloud/docs/api/v1
--
 
 ## To Do
-[] Add Logic to set the House battery charger based on the available data
-[] Add timed worker
-[] Host worker in a cloud service
-[] Add service to read from home smart devices, such as the immersion timer
+- [ ] Add Logic to set the House battery charger based on the available data
+- [ ] Add timed worker
+- [ ] Host worker in a cloud service
+- [ ] Add service to read from home smart devices, such as the immersion timer
 
 ## Future Ideas
 - Add a web interface to view status, configure the logic
