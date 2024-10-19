@@ -5,11 +5,19 @@ using System.Text;
 
 namespace HomePower.MyEnergi.Authentication;
 
+/// <summary>
+/// A message handler that performs HTTP Digest Authentication.
+/// </summary>
 public class DigestAuthHandler : DelegatingHandler
 {
     private readonly string _username;
     private readonly string _password;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DigestAuthHandler"/> class.
+    /// </summary>
+    /// <param name="username">The username for authentication.</param>
+    /// <param name="password">The password for authentication.</param>
     public DigestAuthHandler(string username, string password)
     {
         _username = username;
@@ -17,6 +25,12 @@ public class DigestAuthHandler : DelegatingHandler
         InnerHandler = new HttpClientHandler();
     }
 
+    /// <summary>
+    /// Sends an HTTP request with Digest Authentication.
+    /// </summary>
+    /// <param name="request">The HTTP request message.</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>The HTTP response message.</returns>
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var response = await base.SendAsync(request, cancellationToken);
@@ -43,6 +57,11 @@ public class DigestAuthHandler : DelegatingHandler
         return response;
     }
 
+    /// <summary>
+    /// Parses the Digest challenge from the WWW-Authenticate header.
+    /// </summary>
+    /// <param name="challenge">The challenge string from the WWW-Authenticate header.</param>
+    /// <returns>A <see cref="DigestChallenge"/> object containing the parsed values.</returns>
     private static DigestChallenge ParseDigestChallenge(string challenge)
     {
         var digestChallenge = new DigestChallenge();
@@ -78,6 +97,13 @@ public class DigestAuthHandler : DelegatingHandler
         return digestChallenge;
     }
 
+    /// <summary>
+    /// Creates the Digest response header value.
+    /// </summary>
+    /// <param name="challenge">The parsed Digest challenge.</param>
+    /// <param name="httpMethod">The HTTP method (e.g., GET, POST).</param>
+    /// <param name="uri">The request URI.</param>
+    /// <returns>The Digest response header value.</returns>
     private string CreateDigestResponse(DigestChallenge challenge, string httpMethod, string uri)
     {
         var ha1 = CalculateMD5Hash($"{_username}:{challenge.Realm}:{_password}");
@@ -107,6 +133,11 @@ public class DigestAuthHandler : DelegatingHandler
         return header.ToString();
     }
 
+    /// <summary>
+    /// Calculates the MD5 hash of the specified input string.
+    /// </summary>
+    /// <param name="input">The input string.</param>
+    /// <returns>The MD5 hash as a hexadecimal string.</returns>
     private static string CalculateMD5Hash(string input)
     {
         var inputBytes = Encoding.ASCII.GetBytes(input);
@@ -114,16 +145,11 @@ public class DigestAuthHandler : DelegatingHandler
         return ToHexString(hash);
     }
 
-    /*
-     *     private string CalculateMD5Hash(string input)
-    {
-        using var md5 = MD5.Create();
-        var inputBytes = Encoding.ASCII.GetBytes(input);
-        var hash = md5.ComputeHash(inputBytes);
-        return ToHexString(hash);
-    }
-     */
-
+    /// <summary>
+    /// Converts a byte array to a hexadecimal string.
+    /// </summary>
+    /// <param name="bytes">The byte array.</param>
+    /// <returns>The hexadecimal string.</returns>
     private static string ToHexString(byte[] bytes)
     {
         var sb = new StringBuilder(bytes.Length * 2);
@@ -132,6 +158,10 @@ public class DigestAuthHandler : DelegatingHandler
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Generates a client nonce (cnonce) for the Digest authentication.
+    /// </summary>
+    /// <returns>The generated cnonce as a hexadecimal string.</returns>
     private static string GenerateCNonce()
     {
         var random = new byte[16];
@@ -139,6 +169,11 @@ public class DigestAuthHandler : DelegatingHandler
         return ToHexString(random);
     }
 
+    /// <summary>
+    /// Clones the specified <see cref="HttpRequestMessage"/>.
+    /// </summary>
+    /// <param name="request">The request message to clone.</param>
+    /// <returns>A cloned <see cref="HttpRequestMessage"/>.</returns>
     private static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage request)
     {
         var clone = new HttpRequestMessage(request.Method, request.RequestUri);

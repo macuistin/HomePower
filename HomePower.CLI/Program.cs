@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
+// Load configuration from user secrets
 IConfiguration config = new ConfigurationBuilder()
     .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
     .Build();
@@ -21,13 +22,13 @@ var sp = services
     .AddMyEnergiDependencies(myEnergiSettings!)
     .BuildServiceProvider();
 
-var myEnergiService = sp.GetService<IMyEnergiService>();
-var evChargeStatus = myEnergiService!.GetEvChargeStatus().Result;
-
 var givEnergyService = sp.GetService<IGivEnergyService>();
 var acChargeEnabled = givEnergyService.GetACChargeEnabledAsync().Result;
 var chargeStartTime = givEnergyService.GetBatteryChargeStartTimeAsync().Result;
 var chargeEndTime = givEnergyService.GetBatteryChargeEndTimeAsync().Result;
 
+var myEnergiService = sp.GetService<IMyEnergiService>();
+var evChargeStatus = myEnergiService!.GetEvChargeStatus().Result;
+
 Console.WriteLine($"Charging Status\n: {evChargeStatus}");
-Console.WriteLine($"Houre Battery Charger\n Enabled: {acChargeEnabled}, Start: {chargeStartTime}, End: {chargeEndTime}");
+Console.WriteLine($"House Battery Charger\n Enabled: {acChargeEnabled}, Start: {chargeStartTime}, End: {chargeEndTime}");

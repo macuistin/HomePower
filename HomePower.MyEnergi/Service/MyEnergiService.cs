@@ -4,10 +4,13 @@ using System.Net.Http.Json;
 
 namespace HomePower.MyEnergi.Service;
 
-public class MyEnergiService(HttpClient httpClient) : IMyEnergiService
+/// <summary>
+/// Provides methods to interact with MyEnergi services.
+/// </summary>
+/// <param name="httpClient">The HTTP client used to make requests to the MyEnergi API.</param>
+public class MyEnergiService(HttpClient _httpClient) : IMyEnergiService
 {
-    private readonly HttpClient _httpClient = httpClient;
-
+    /// <inheritdoc/>
     public async Task<ZappiStatusResult> GetZappiStatusAsync()
     {
         var response = await _httpClient.GetAsync("/cgi-jstatus-Z");
@@ -23,6 +26,7 @@ public class MyEnergiService(HttpClient httpClient) : IMyEnergiService
         return ZappiStatusResult.CreateSuccess(responseDto.Zappi.First());
     }
 
+    /// <inheritdoc/>
     public async Task<EvChargeStatus> GetEvChargeStatus()
     {
         var zappiStatus = await GetZappiStatusAsync();

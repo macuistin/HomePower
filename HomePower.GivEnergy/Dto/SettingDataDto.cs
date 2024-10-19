@@ -1,6 +1,6 @@
 ﻿namespace HomePower.GivEnergy.Dto;
 
-public record SettingDataDto
+public record SettingDataDto<T> where T : notnull
 {
-    public required string Value { get; set; }
+    public required T Value { get; set; }
 }

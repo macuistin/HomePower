@@ -30,16 +30,16 @@ public class GivEnergyServiceTests
     {
         return new GivEnergyService(
             _httpClient,
-            new GivEnergySettings() { InverterSerialNumber = "serial"});
+            new GivEnergySettings() { InverterSerialNumber = "serial", ApiBearer = "Bearer", BaseUrl = "http://baseurl" });
     }
 
     [Fact]
     public async Task GetBatteryChargeStartTimeAsync_ReturnsCorrectTime()
     {
         // Arrange
-        var settingResponseDto = new SettingResponseDto
+        var settingResponseDto = new SettingResponseDto<string>
         {
-            Data = new SettingDataDto { Value = "08:00" }
+            Data = new SettingDataDto<string> { Value = "08:00" }
         };
         ConfigureHttpGetResponseOk(settingResponseDto);
 
@@ -71,9 +71,9 @@ public class GivEnergyServiceTests
     public async Task GetBatteryChargeEndTimeAsync_ReturnsCorrectTime()
     {
         // Arrange
-        var settingResponseDto = new SettingResponseDto
+        var settingResponseDto = new SettingResponseDto<string>
         {
-            Data = new SettingDataDto { Value = "20:00" }
+            Data = new SettingDataDto<string> { Value = "20:00" }
         };
         ConfigureHttpGetResponseOk(settingResponseDto);
 
@@ -105,9 +105,9 @@ public class GivEnergyServiceTests
     public async Task GetACChargeEnabledAsync_ReturnsTrue()
     {
         // Arrange
-        var settingResponseDto = new SettingResponseDto
+        var settingResponseDto = new SettingResponseDto<bool>
         {
-            Data = new SettingDataDto { Value = "true" }
+            Data = new SettingDataDto<bool> { Value = true }
         };
         ConfigureHttpGetResponseOk(settingResponseDto);
 

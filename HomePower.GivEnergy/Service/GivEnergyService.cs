@@ -1,6 +1,6 @@
-﻿using HomePower.GivEnergy;
-using HomePower.GivEnergy.Dto;
+﻿using HomePower.GivEnergy.Dto;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace HomePower.GivEnergy.Service;
 
@@ -11,71 +11,82 @@ internal enum SettingId
     ACChargeEnable = 66       // boolean
 }
 
+/// <summary>
+/// Provides methods to interact with GivEnergy services.
+/// </summary>
+/// <param name="_httpClient">The HTTP client used to make requests to the GivEnergy API.</param>
+/// <param name="_settings">The settings for GivEnergy integration.</param>
 public class GivEnergyService(HttpClient _httpClient, GivEnergySettings _settings) : IGivEnergyService
 {
     const string ApiContext = "HomePower automation";
 
-    private async Task<SettingResponseDto> GetSettingAsync(SettingId settingId)
+    private async Task<SettingResponseDto<T>> GetSettingAsync<T>(SettingId settingId) 
+        where T : notnull
     {
-        var apiPath = $"/inverter/{_settings.InverterSerialNumber}/settings/{(int)settingId}/read";
+        var apiPath = $"/v1/inverter/{_settings.InverterSerialNumber}/settings/{(int)settingId}/read";
         var request = new SettingRequestDto
         {
             Id = (int)settingId,
             Context = ApiContext
         };
+
+        // I did not design this API endpoint.
+        // It incorrectly uses a Post and HttpStatusCode.Created to simulate a successful request
         var response = await _httpClient.PostAsJsonAsync(apiPath, request);
+        if (response.StatusCode != System.Net.HttpStatusCode.Created)
+            return SettingResponseDto<T>.Failed;
 
-        if (response.StatusCode != System.Net.HttpStatusCode.OK)
-            return SettingResponseDto.Failed;
+        var responseDto = await response.Content.ReadFromJsonAsync<SettingResponseDto<T>>();
 
-        var responseDto = await response.Content.ReadFromJsonAsync<SettingResponseDto>();
-
-        return responseDto ?? SettingResponseDto.Failed;
+        return responseDto ?? SettingResponseDto<T>.Failed;
     }
 
-    private async Task<bool> UpdateSettingAsync(SettingId settingId, string value)
+    private async Task<bool> UpdateSettingAsync<T>(SettingId settingId, T value)
+        where T : notnull
     {
-        var apiPath = $"/inverter/{_settings.InverterSerialNumber}/settings/{(int)settingId}/write";
+        var apiPath = $"/v1/inverter/{_settings.InverterSerialNumber}/settings/{(int)settingId}/write";
         await Task.Delay(100);
 
         return true;
     }
 
+    /// <inheritdoc/>
     public async Task<string> GetBatteryChargeStartTimeAsync()
     {
-        var result = await GetSettingAsync(SettingId.ACCharge1StartTime);
+        var result = await GetSettingAsync<string>(SettingId.ACCharge1StartTime);
 
         // TODO: This is a PoC, we should handle this better
-        if (result == SettingResponseDto.Failed)
+        if (result == SettingResponseDto<string>.Failed)
             return string.Empty;
 
         return result.Data.Value;
     }
 
+    /// <inheritdoc/>
     public async Task<string> GetBatteryChargeEndTimeAsync()
     {
-        var result = await GetSettingAsync(SettingId.ACCharge1EndTime);
+        var result = await GetSettingAsync<string>(SettingId.ACCharge1EndTime);
 
         // TODO: This is a PoC, we should handle this better
-        if (result == SettingResponseDto.Failed)
+        if (result == SettingResponseDto<string>.Failed)
             return string.Empty;
 
         return result.Data.Value;
     }
 
+    /// <inheritdoc/>
     public async Task<bool> GetACChargeEnabledAsync()
     {
-        var result = await GetSettingAsync(SettingId.ACChargeEnable);
-
-        if (result == SettingResponseDto.Failed)
-            return false;
+        var result = await GetSettingAsync<bool>(SettingId.ACChargeEnable);
 
         // TODO: This is a PoC, we should handle this better
-        var success = bool.TryParse(result.Data.Value, out var value);
+        if (result == SettingResponseDto<bool>.Failed)
+            return false;
 
-        return success && value;
+        return result?.Data?.Value ?? false;
     }
 
+    /// <inheritdoc/>
     public async Task<bool> UpdateBatteryChargeStartTimeAsync(int hour, int minute)
     {
         if (hour < 0 || hour > 23)
@@ -83,9 +94,10 @@ public class GivEnergyService(HttpClient _httpClient, GivEnergySettings _setting
         if (minute < 0 || minute > 59)
             return false;
 
-        return await UpdateSettingAsync(SettingId.ACCharge1StartTime, $"{hour:00}:{minute:00}");
+        return await UpdateSettingAsync<string>(SettingId.ACCharge1StartTime, $"{hour:00}:{minute:00}");
     }
 
+    /// <inheritdoc/>
     public async Task<bool> UpdateBatteryChargeEndTimeAsync(int hour, int minute)
     {
         if (hour < 0 || hour > 23)
@@ -93,11 +105,12 @@ public class GivEnergyService(HttpClient _httpClient, GivEnergySettings _setting
         if (minute < 0 || minute > 59)
             return false;
 
-        return await UpdateSettingAsync(SettingId.ACCharge1EndTime, $"{hour:00}:{minute:00}");
+        return await UpdateSettingAsync<string>(SettingId.ACCharge1EndTime, $"{hour:00}:{minute:00}");
     }
 
+    /// <inheritdoc/>
     public async Task<bool> UpdateACChargeEnabledAsync(bool enabled)
     {
-        return await UpdateSettingAsync(SettingId.ACChargeEnable, enabled.ToString());
+        return await UpdateSettingAsync<bool>(SettingId.ACChargeEnable, enabled);
     }
 }

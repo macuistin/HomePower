@@ -3,28 +3,43 @@
 public interface IGivEnergyService
 {
     /// <summary>
-    /// Is the AC battery charging enabled
+    /// Checks if the AC battery charging is enabled.
     /// </summary>
-    /// <returns>boolean</returns>
+    /// <returns>A boolean indicating if AC charging is enabled.</returns>
     Task<bool> GetACChargeEnabledAsync();
 
     /// <summary>
-    /// Time the AC battery charging ends
+    /// Gets the time when the AC battery charging ends.
     /// </summary>
-    /// <returns>Time AC charging ends,HH:mm</returns>
+    /// <returns>The time when AC charging ends in HH:mm format.</returns>
     Task<string> GetBatteryChargeEndTimeAsync();
 
     /// <summary>
-    /// Time the AC battery charging starts
+    /// Gets the time when the AC battery charging starts.
     /// </summary>
-    /// <returns>Time AC charging starts,HH:mm</returns>
-
+    /// <returns>The time when AC charging starts in HH:mm format.</returns>
     Task<string> GetBatteryChargeStartTimeAsync();
 
-
+    /// <summary>
+    /// Updates the AC battery charging enabled status.
+    /// </summary>
+    /// <param name="enabled">A boolean indicating if AC charging should be enabled.</param>
+    /// <returns>A boolean indicating if the update was successful.</returns>
     Task<bool> UpdateACChargeEnabledAsync(bool enabled);
 
+    /// <summary>
+    /// Updates the time when the AC battery charging ends.
+    /// </summary>
+    /// <param name="hour">The hour when AC charging ends (0-23).</param>
+    /// <param name="minute">The minute when AC charging ends (0-59).</param>
+    /// <returns>A boolean indicating if the update was successful.</returns>
     Task<bool> UpdateBatteryChargeEndTimeAsync(int hour, int minute);
 
+    /// <summary>
+    /// Updates the time when the AC battery charging starts.
+    /// </summary>
+    /// <param name="hour">The hour when AC charging starts (0-23).</param>
+    /// <param name="minute">The minute when AC charging starts (0-59).</param>
+    /// <returns>A boolean indicating if the update was successful.</returns>
     Task<bool> UpdateBatteryChargeStartTimeAsync(int hour, int minute);
 }

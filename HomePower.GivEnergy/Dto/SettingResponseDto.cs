@@ -1,17 +1,17 @@
 ﻿namespace HomePower.GivEnergy.Dto;
 
-public record SettingResponseDto
+public record SettingResponseDto<T> where T : notnull
 {
-    public static readonly SettingResponseDto Failed = new()
+    public static readonly SettingResponseDto<T> Failed = new()
     {
         Success = false,
         Data = new()
         {
-            Value = string.Empty
+            Value = default
         }
     };
 
-    public required SettingDataDto Data { get; set; }
+    public required SettingDataDto<T> Data { get; set; }
 
     public bool Success { get; private set; } = true;
 }

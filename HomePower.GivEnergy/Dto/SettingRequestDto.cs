@@ -1,7 +1,12 @@
-﻿namespace HomePower.GivEnergy.Dto;
+﻿using System.Text.Json.Serialization;
+
+namespace HomePower.GivEnergy.Dto;
 
 internal record SettingRequestDto
 {
-    public int Id { get; set; }
+    [JsonPropertyName("id")]
+    public int Id { get;  set; }
+
+    [JsonPropertyName("context")]
     public required string Context { get; set; }
 }
