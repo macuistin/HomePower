@@ -25,13 +25,12 @@ public class GivEnergyService(HttpClient _httpClient, GivEnergySettings _setting
     {
         var apiPath = $"/v1/inverter/{_settings.InverterSerialNumber}/settings/{(int)settingId}/read";
         var request = new SettingRequestDto
-        {
-            Id = (int)settingId,
+        { 
             Context = ApiContext
         };
 
         // I did not design this API endpoint.
-        // It incorrectly uses a Post and HttpStatusCode.Created to simulate a successful request
+        // It incorrectly uses a Post and HttpStatusCode.Created to get values
         var response = await _httpClient.PostAsJsonAsync(apiPath, request);
         if (response.StatusCode != System.Net.HttpStatusCode.Created)
             return SettingResponseDto<T>.Failed;
@@ -45,9 +44,12 @@ public class GivEnergyService(HttpClient _httpClient, GivEnergySettings _setting
         where T : notnull
     {
         var apiPath = $"/v1/inverter/{_settings.InverterSerialNumber}/settings/{(int)settingId}/write";
+
         await Task.Delay(100);
 
-        return true;
+        throw new System.NotImplementedException("I just haven't got to this yet!");
+
+        //return true;
     }
 
     /// <inheritdoc/>
