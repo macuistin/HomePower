@@ -49,7 +49,7 @@ public class GivEnergyServiceTests
         var result = await service.GetBatteryChargeStartTimeAsync();
 
         // Assert
-        Assert.Equal("08:00", result);
+        Assert.Equal("08:00", result.ToString("HH:mm"));
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class GivEnergyServiceTests
         var result = await service.GetBatteryChargeStartTimeAsync();
 
         // Assert
-        Assert.Equal(string.Empty, result);
+        Assert.Equal(default, result);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class GivEnergyServiceTests
         var result = await service.GetBatteryChargeEndTimeAsync();
 
         // Assert
-        Assert.Equal("20:00", result);
+        Assert.Equal("20:00", result.ToString("HH:mm"));
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class GivEnergyServiceTests
         var result = await service.GetBatteryChargeEndTimeAsync();
 
         // Assert
-        Assert.Equal(string.Empty, result);
+        Assert.Equal(default, result);
     }
 
     [Fact]

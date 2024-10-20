@@ -12,13 +12,13 @@ public interface IGivEnergyService
     /// Gets the time when the AC battery charging ends.
     /// </summary>
     /// <returns>The time when AC charging ends in HH:mm format.</returns>
-    Task<string> GetBatteryChargeEndTimeAsync();
+    Task<TimeOnly> GetBatteryChargeEndTimeAsync();
 
     /// <summary>
     /// Gets the time when the AC battery charging starts.
     /// </summary>
     /// <returns>The time when AC charging starts in HH:mm format.</returns>
-    Task<string> GetBatteryChargeStartTimeAsync();
+    Task<TimeOnly> GetBatteryChargeStartTimeAsync();
 
     /// <summary>
     /// Updates the AC battery charging enabled status.

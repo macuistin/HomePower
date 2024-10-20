@@ -1,6 +1,5 @@
 ﻿using HomePower.GivEnergy.Dto;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace HomePower.GivEnergy.Service;
 
@@ -53,27 +52,29 @@ public class GivEnergyService(HttpClient _httpClient, GivEnergySettings _setting
     }
 
     /// <inheritdoc/>
-    public async Task<string> GetBatteryChargeStartTimeAsync()
+    public async Task<TimeOnly> GetBatteryChargeStartTimeAsync()
     {
         var result = await GetSettingAsync<string>(SettingId.ACCharge1StartTime);
 
         // TODO: This is a PoC, we should handle this better
-        if (result == SettingResponseDto<string>.Failed)
-            return string.Empty;
 
-        return result.Data.Value;
+        if (result.Success && TimeOnly.TryParse(result.Data.Value, out var time))
+            return time;
+
+        return default;
     }
 
     /// <inheritdoc/>
-    public async Task<string> GetBatteryChargeEndTimeAsync()
+    public async Task<TimeOnly> GetBatteryChargeEndTimeAsync()
     {
         var result = await GetSettingAsync<string>(SettingId.ACCharge1EndTime);
 
         // TODO: This is a PoC, we should handle this better
-        if (result == SettingResponseDto<string>.Failed)
-            return string.Empty;
+        
+        if (result.Success && TimeOnly.TryParse(result.Data.Value, out var time))
+            return time;
 
-        return result.Data.Value;
+        return default;
     }
 
     /// <inheritdoc/>
@@ -82,10 +83,10 @@ public class GivEnergyService(HttpClient _httpClient, GivEnergySettings _setting
         var result = await GetSettingAsync<bool>(SettingId.ACChargeEnable);
 
         // TODO: This is a PoC, we should handle this better
-        if (result == SettingResponseDto<bool>.Failed)
-            return false;
-
-        return result?.Data?.Value ?? false;
+        if (result.Success)
+            return result?.Data?.Value ?? false;
+        
+        return false;        
     }
 
     /// <inheritdoc/>
