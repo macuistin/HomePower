@@ -13,26 +13,23 @@ namespace HomePower.Orchestrator.IntegrationTests
         private Mock<IGivEnergyService> _givEnergyServiceMock;
         private Mock<IMyEnergiService> _myEnergiServiceMock;
         private Mock<ITimeProvider> _timeProviderMock;
-
-
-        private static class HandlerContextDefaults
-        {
-            public static int EvChargeLowPowerCutOffWatts => 3000;
-            public static TimeOnly ImmersionStart => TimeOnly.Parse("06:25", CultureInfo.InvariantCulture);
-            public static TimeOnly ImmersionEnd => TimeOnly.Parse("07:10", CultureInfo.InvariantCulture);
-
-            public static TimeOnly HouseChargeWindowStart => TimeOnly.Parse("01:00", CultureInfo.InvariantCulture);
-            public static TimeOnly HouseChargeWindowEnd => TimeOnly.Parse("08:00", CultureInfo.InvariantCulture);
-
-            public static TimeOnly PreImmersionTime => ImmersionStart.AddMinutes(-3);
-            public static TimeOnly PostImmersionTime => ImmersionEnd.AddMinutes(1);
-        }
+        private OrchestratorSettings _settings;
 
         public HomeChargerOrchestratorTests()
         {
             _givEnergyServiceMock = new Mock<IGivEnergyService>();
             _myEnergiServiceMock = new Mock<IMyEnergiService>();
             _timeProviderMock = new Mock<ITimeProvider>();
+            _settings = new OrchestratorSettings
+            {
+                EvChargeLowPowerCutOffWatts = 3000,
+                ImmersionStart = TimeOnly.Parse("06:25", CultureInfo.InvariantCulture),
+                ImmersionEnd = TimeOnly.Parse("07:10", CultureInfo.InvariantCulture),
+                HouseChargeWindowStart = TimeOnly.Parse("01:00", CultureInfo.InvariantCulture),
+                HouseChargeWindowEnd = TimeOnly.Parse("08:00", CultureInfo.InvariantCulture),
+                PreImmersionMinutes = -3,
+                PostImmersionMinutes = 1
+            };
         }
 
         private IHomeChargerOrchestrator CreateHomeChargerOrchestrator()
@@ -41,7 +38,7 @@ namespace HomePower.Orchestrator.IntegrationTests
             var sp = services
                 .AddSingleton(_givEnergyServiceMock.Object)
                 .AddSingleton(_myEnergiServiceMock.Object)
-                .AddOrchestratorServices()
+                .AddOrchestratorServices(_settings)
                 .RemoveAll<ITimeProvider>()
                 .AddSingleton(_timeProviderMock.Object)
                 .BuildServiceProvider();
@@ -99,8 +96,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -152,8 +149,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.PreImmersionTime)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.PreImmersionTime)), Times.Once);
         }
 
         [Fact]
@@ -179,8 +176,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.PostImmersionTime)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.PostImmersionTime)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -232,8 +229,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -259,8 +256,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -286,8 +283,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -313,8 +310,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -340,8 +337,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -367,8 +364,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -394,8 +391,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -421,8 +418,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
 
         [Fact]
@@ -448,8 +445,8 @@ namespace HomePower.Orchestrator.IntegrationTests
             // Assert
             Assert.True(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowStart)), Times.Once);
-            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == HandlerContextDefaults.HouseChargeWindowEnd)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeStartTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowStart)), Times.Once);
+            _givEnergyServiceMock.Verify(m => m.UpdateBatteryChargeEndTimeAsync(It.Is<TimeOnly>(t => t == _settings.HouseChargeWindowEnd)), Times.Once);
         }
     }
 }

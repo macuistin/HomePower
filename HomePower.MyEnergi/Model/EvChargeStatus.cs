@@ -39,17 +39,4 @@ public record EvChargeStatus
     /// Gets or sets the Zappi mode.
     /// </summary>
     public ZappiMode ZappiMode { get; set; } = ZappiMode.Unknown;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether daylight saving is active.
-    /// </summary>
-    public bool IsDayLightsSaving { get; internal set; }
-
-    /// <summary>
-    /// Returns a string representation of the current object.
-    /// </summary>
-    public override string ToString()
-    {
-        return $"Added:{ChargeAddedKWh}KWh, Rate:{ChargeRateWatts}W, Charger:{ChargerStatus}, Charging:{ChargingStatus}, Mode:{ZappiMode}, Lock:{LockStatus}";
-    }
 }

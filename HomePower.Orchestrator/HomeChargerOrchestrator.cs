@@ -18,7 +18,8 @@ public class HomeChargerOrchestrator(
     IGivEnergyService _givEnergyService,
     IMyEnergiService _myEnergiService, 
     ITimeProvider _timeProvider,
-    IChargingHandler _firstHandler) : IHomeChargerOrchestrator
+    IChargingHandler _firstHandler,
+    OrchestratorSettings _settings) : IHomeChargerOrchestrator
 {
     /// <inheritdoc/>
     public async Task<bool> UpdateChargingScheduleAsync()
@@ -39,6 +40,7 @@ public class HomeChargerOrchestrator(
 
         var context = new HandlerContext
         {
+            Settings = _settings,
             EvChargeStatus = evChargeStatus,
             CurrentTime = _timeProvider.GetCurrentTime()
         };

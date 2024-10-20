@@ -12,7 +12,8 @@ public static class ServiceCollectionExtensions
     /// Adds the orchestrator services to the specified <see cref="IServiceCollection" />.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
-    public static IServiceCollection AddOrchestratorServices(this IServiceCollection services)
+    /// <param name="settings">Orchestrator settings.</param>
+    public static IServiceCollection AddOrchestratorServices(this IServiceCollection services, OrchestratorSettings settings)
     {
         // Register all IChargingHandler implementations from the current assembly
         var assembly = Assembly.GetExecutingAssembly();
@@ -25,20 +26,21 @@ public static class ServiceCollectionExtensions
         }
 
         services
-            .AddTransient<IChargingHandlerChainBuilder, ChargingHandlerChainBuilder>()
+            .AddSingleton(settings)
             .AddSingleton<ITimeProvider, TimeProvider>()
+            .AddTransient<IChargingHandlerChainBuilder, ChargingHandlerChainBuilder>()
             .AddTransient<IHomeChargerOrchestrator, HomeChargerOrchestrator>(sp => 
             { 
                 var ges = sp.GetRequiredService<IGivEnergyService>();
                 var mes = sp.GetRequiredService<IMyEnergiService>();
                 var tp = sp.GetRequiredService<ITimeProvider>();
                 var cp = sp.GetRequiredService<IChargingHandlerChainBuilder>();
+                var os = sp.GetRequiredService<OrchestratorSettings>();
 
                 var firstHandler = cp.BuildChain();
 
-                return new HomeChargerOrchestrator(ges, mes, tp, firstHandler);
+                return new HomeChargerOrchestrator(ges, mes, tp, firstHandler, os);
             });
-
 
         return services;
     }

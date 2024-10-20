@@ -7,9 +7,8 @@ namespace HomePower.Orchestrator;
 /// </summary>
 public class HandlerContext
 {
-    public OrchestratorSettings Settings { get; } = new OrchestratorSettings();
-
     // Information for the handler
+    public required OrchestratorSettings Settings { get; init; }
     public required EvChargeStatus EvChargeStatus { get; init; }
     public required TimeOnly CurrentTime { get; init; }
 

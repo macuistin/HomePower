@@ -8,7 +8,7 @@ public class GivEnergySettings
     /// <summary>
     /// Gets or sets the base URL for the GivEnergy API.
     /// </summary>
-    public required string BaseUrl { get; set; } = "https://api.givenergy.cloud/";
+    public required string BaseUrl { get; set; }
 
     /// <summary>
     /// Gets or sets the API bearer token for authentication.

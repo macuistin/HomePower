@@ -1,18 +1,17 @@
-﻿using System.Globalization;
+﻿namespace HomePower.Orchestrator;
 
-namespace HomePower.Orchestrator;
-
-public class OrchestratorSettings
+public record OrchestratorSettings
 {
-    // TODO: Load these settings to a configuration file
-    public int EvChargeLowPowerCutOffWatts => 3000;
+    // Properties
+    public int EvChargeLowPowerCutOffWatts { get; init; }
+    public TimeOnly ImmersionStart { get; init; }
+    public TimeOnly ImmersionEnd { get; init; }
+    public TimeOnly HouseChargeWindowStart { get; init; }
+    public TimeOnly HouseChargeWindowEnd { get; init; }
+    
+    public int PreImmersionMinutes { get; init; }
+    public int PostImmersionMinutes { get; init; }
 
-    public TimeOnly ImmersionStart => TimeOnly.Parse("06:25", CultureInfo.InvariantCulture);
-    public TimeOnly ImmersionEnd => TimeOnly.Parse("07:10", CultureInfo.InvariantCulture);
-
-    public TimeOnly HouseChargeWindowStart => TimeOnly.Parse("01:00", CultureInfo.InvariantCulture);
-    public TimeOnly HouseChargeWindowEnd => TimeOnly.Parse("08:00", CultureInfo.InvariantCulture);
-
-    public TimeOnly PreImmersionTime => ImmersionStart.AddMinutes(-3);
-    public TimeOnly PostImmersionTime => ImmersionEnd.AddMinutes(1);
+    public TimeOnly PreImmersionTime => ImmersionStart.AddMinutes(PreImmersionMinutes);
+    public TimeOnly PostImmersionTime => ImmersionEnd.AddMinutes(PostImmersionMinutes);
 }

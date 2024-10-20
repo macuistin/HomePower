@@ -12,8 +12,7 @@ internal static class MappingExtensions
             ChargerStatus = zappi.ChargerStatus.ToChargerStatus(),
             ChargingStatus = zappi.ChargingStatus.ToChargingStatus(),
             LockStatus = zappi.LockStatus.ToLockStatus(),
-            ZappiMode = zappi.ZappiMode.ToZappiMode(),
-            IsDayLightsSaving = zappi.UseDaylightSavingsTime == 1
+            ZappiMode = zappi.ZappiMode.ToZappiMode()
         };
     }
 
