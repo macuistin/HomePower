@@ -16,7 +16,7 @@ public class TimeRangeHandler : IChargingHandler
 
     public async Task HandleAsync(HandlerContext context)
     {
-        if (context.CurrentTime.Hour < context.HouseChargeWindowStart.Hour || context.CurrentTime.Hour >= context.HouseChargeWindowEnd.Hour)
+        if (context.CurrentTime < context.HouseChargeWindowStart || context.CurrentTime >= context.HouseChargeWindowEnd)
         {
             // Do nothing
             return;

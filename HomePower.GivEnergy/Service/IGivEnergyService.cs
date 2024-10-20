@@ -33,7 +33,7 @@ public interface IGivEnergyService
     /// <param name="hour">The hour when AC charging ends (0-23).</param>
     /// <param name="minute">The minute when AC charging ends (0-59).</param>
     /// <returns>A boolean indicating if the update was successful.</returns>
-    Task<bool> UpdateBatteryChargeEndTimeAsync(int hour, int minute);
+    Task<bool> UpdateBatteryChargeEndTimeAsync(TimeOnly startTime);
 
     /// <summary>
     /// Updates the time when the AC battery charging starts.
@@ -41,5 +41,5 @@ public interface IGivEnergyService
     /// <param name="hour">The hour when AC charging starts (0-23).</param>
     /// <param name="minute">The minute when AC charging starts (0-59).</param>
     /// <returns>A boolean indicating if the update was successful.</returns>
-    Task<bool> UpdateBatteryChargeStartTimeAsync(int hour, int minute);
+    Task<bool> UpdateBatteryChargeStartTimeAsync(TimeOnly endTime);
 }

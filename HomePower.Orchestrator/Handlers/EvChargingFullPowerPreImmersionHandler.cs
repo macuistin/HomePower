@@ -22,8 +22,8 @@ public class EvChargingFullPowerPreImmersionHandler : IChargingHandler
             && context.EvChargeStatus.ChargeRateWatts > context.EvChargeLowPowerCutOffWatts
             && context.CurrentTime < context.PreImmersionTime)
         {
-            await context.GivEnergyService.UpdateBatteryChargeStartTimeAsync(context.HouseChargeWindowStart.Hour, context.HouseChargeWindowStart.Minute);
-            await context.GivEnergyService.UpdateBatteryChargeEndTimeAsync(context.PreImmersionTime.Hour, context.PreImmersionTime.Minute);
+            await context.GivEnergyService.UpdateBatteryChargeStartTimeAsync(context.HouseChargeWindowStart);
+            await context.GivEnergyService.UpdateBatteryChargeEndTimeAsync(context.PreImmersionTime);
 
             return;
         }

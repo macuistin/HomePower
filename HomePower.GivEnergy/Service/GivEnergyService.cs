@@ -89,25 +89,15 @@ public class GivEnergyService(HttpClient _httpClient, GivEnergySettings _setting
     }
 
     /// <inheritdoc/>
-    public async Task<bool> UpdateBatteryChargeStartTimeAsync(int hour, int minute)
+    public async Task<bool> UpdateBatteryChargeStartTimeAsync(TimeOnly startTime)
     {
-        if (hour < 0 || hour > 23)
-            return false;
-        if (minute < 0 || minute > 59)
-            return false;
-
-        return await UpdateSettingAsync<string>(SettingId.ACCharge1StartTime, $"{hour:00}:{minute:00}");
+        return await UpdateSettingAsync<string>(SettingId.ACCharge1StartTime, $"{startTime:HH:mm}");
     }
 
     /// <inheritdoc/>
-    public async Task<bool> UpdateBatteryChargeEndTimeAsync(int hour, int minute)
+    public async Task<bool> UpdateBatteryChargeEndTimeAsync(TimeOnly endTime)
     {
-        if (hour < 0 || hour > 23)
-            return false;
-        if (minute < 0 || minute > 59)
-            return false;
-
-        return await UpdateSettingAsync<string>(SettingId.ACCharge1EndTime, $"{hour:00}:{minute:00}");
+        return await UpdateSettingAsync<string>(SettingId.ACCharge1StartTime, $"{endTime:HH:mm}");
     }
 
     /// <inheritdoc/>

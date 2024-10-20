@@ -16,8 +16,8 @@ internal class EvNotChargingHandler : IChargingHandler
     {
         if (context.EvChargeStatus.ChargerStatus != ChargerStatus.Charging)
         {
-            await context.GivEnergyService.UpdateBatteryChargeStartTimeAsync(context.HouseChargeWindowStart.Hour, context.HouseChargeWindowStart.Minute);
-            await context.GivEnergyService.UpdateBatteryChargeEndTimeAsync(context.HouseChargeWindowEnd.Hour, context.HouseChargeWindowEnd.Minute);
+            await context.GivEnergyService.UpdateBatteryChargeStartTimeAsync(context.HouseChargeWindowStart);
+            await context.GivEnergyService.UpdateBatteryChargeEndTimeAsync(context.HouseChargeWindowEnd);
 
             return;
         }

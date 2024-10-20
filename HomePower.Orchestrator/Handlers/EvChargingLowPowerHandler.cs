@@ -18,8 +18,8 @@ internal class EvChargingLowPowerHandler : IChargingHandler
             && context.EvChargeStatus.ChargeRateWatts < context.EvChargeLowPowerCutOffWatts
             && context.CurrentTime < context.PreImmersionTime)
         {
-            await context.GivEnergyService.UpdateBatteryChargeStartTimeAsync(context.HouseChargeWindowStart.Hour, context.HouseChargeWindowStart.Minute);
-            await context.GivEnergyService.UpdateBatteryChargeEndTimeAsync(context.HouseChargeWindowEnd.Hour, context.HouseChargeWindowEnd.Minute);
+            await context.GivEnergyService.UpdateBatteryChargeStartTimeAsync(context.HouseChargeWindowStart);
+            await context.GivEnergyService.UpdateBatteryChargeEndTimeAsync(context.HouseChargeWindowEnd);
 
             return;
         }

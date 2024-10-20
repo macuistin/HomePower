@@ -41,7 +41,7 @@ public class GivEnergyServiceTests
         {
             Data = new SettingDataDto<string> { Value = "08:00" }
         };
-        ConfigureHttpGetResponseOk(settingResponseDto);
+        ConfigureHttpGetResponseCreated(settingResponseDto);
 
         var service = CreateService();
 
@@ -75,7 +75,7 @@ public class GivEnergyServiceTests
         {
             Data = new SettingDataDto<string> { Value = "20:00" }
         };
-        ConfigureHttpGetResponseOk(settingResponseDto);
+        ConfigureHttpGetResponseCreated(settingResponseDto);
 
         var service = CreateService();
 
@@ -109,7 +109,7 @@ public class GivEnergyServiceTests
         {
             Data = new SettingDataDto<bool> { Value = true }
         };
-        ConfigureHttpGetResponseOk(settingResponseDto);
+        ConfigureHttpGetResponseCreated(settingResponseDto);
 
         var service = CreateService();
 
@@ -142,23 +142,10 @@ public class GivEnergyServiceTests
         var service = CreateService();
 
         // Act
-        var result = await service.UpdateBatteryChargeStartTimeAsync(8, 0);
+        var result = await service.UpdateBatteryChargeStartTimeAsync(new TimeOnly(8, 0));
 
         // Assert
         Assert.True(result);
-    }
-
-    [Fact]
-    public async Task UpdateBatteryChargeStartTimeAsync_ReturnsFalse_OnInvalidTime()
-    {
-        // Arrange
-        var service = CreateService();
-
-        // Act
-        var result = await service.UpdateBatteryChargeStartTimeAsync(25, 0);
-
-        // Assert
-        Assert.False(result);
     }
 
     [Fact]
@@ -168,23 +155,10 @@ public class GivEnergyServiceTests
         var service = CreateService();
 
         // Act
-        var result = await service.UpdateBatteryChargeEndTimeAsync(20, 0);
+        var result = await service.UpdateBatteryChargeEndTimeAsync(new TimeOnly(8, 0));
 
         // Assert
         Assert.True(result);
-    }
-
-    [Fact]
-    public async Task UpdateBatteryChargeEndTimeAsync_ReturnsFalse_OnInvalidTime()
-    {
-        // Arrange
-        var service = CreateService();
-
-        // Act
-        var result = await service.UpdateBatteryChargeEndTimeAsync(20, 60);
-
-        // Assert
-        Assert.False(result);
     }
 
     [Fact]
@@ -202,7 +176,7 @@ public class GivEnergyServiceTests
 
 
     #region Helper methods
-    private void ConfigureHttpGetResponseOk<T>(T content)
+    private void ConfigureHttpGetResponseCreated<T>(T content)
     {
         _httpMessageHandlerMock.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -210,7 +184,7 @@ public class GivEnergyServiceTests
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created)
             {
                 Content = JsonContent.Create(content)
             });
