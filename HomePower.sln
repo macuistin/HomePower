@@ -22,9 +22,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomePower.MyEnergi.UnitTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomePower.Orchestrator", "HomePower.Orchestrator\HomePower.Orchestrator.csproj", "{F30951CE-E77D-4575-9E51-4C9F645F79BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomePower.Orchestrator.UnitTests", "HomePower.Orchestrator.UnitTests\HomePower.Orchestrator.UnitTests.csproj", "{31EB814A-24C8-4A6C-A651-35C29048F3AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomePower.Orchestrator.UnitTests", "Tests\HomePower.Orchestrator.UnitTests\HomePower.Orchestrator.UnitTests.csproj", "{31EB814A-24C8-4A6C-A651-35C29048F3AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomePower.Orchestrator.IntegrationTests", "HomePower.Orchestrator.IntegrationTests\HomePower.Orchestrator.IntegrationTests.csproj", "{0519ECD9-D4EC-4123-8274-DD4A0A1932F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomePower.Orchestrator.IntegrationTests", "Tests\HomePower.Orchestrator.IntegrationTests\HomePower.Orchestrator.IntegrationTests.csproj", "{0519ECD9-D4EC-4123-8274-DD4A0A1932F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HomePower.Orchestrator\HomePower.Orchestrator.csproj" />
+    <ProjectReference Include="..\..\HomePower.Orchestrator\HomePower.Orchestrator.csproj" />
   </ItemGroup>
 
   <ItemGroup>
