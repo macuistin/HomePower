@@ -1,6 +1,5 @@
 ﻿namespace HomePower.GivEnergy.Dto;
 
-
 /// <summary>
 /// Represents a response from the GivEnergy API for a specific setting.
 /// </summary>
@@ -18,7 +17,7 @@ public record SettingResponseDto<T> where T : notnull
         Success = false,
         Data = new()
         {
-            Value = default
+            Value = default!
         }
     };
 
