@@ -28,9 +28,6 @@ public class HomeChargerOrchestrator(
 
         _firstHandler.Handle(context);
 
-        if (!context.ShouldUpdateChargeTimes)
-            return false;
-
         return await UpdateChargerTimesAsync(context);
     }
 
@@ -50,7 +47,8 @@ public class HomeChargerOrchestrator(
 
     private async Task<bool> UpdateChargerTimesAsync(HandlerContext context)
     {
-        if (context.NewChargeStartTime > context.NewChargeEndTime)
+        if (!context.ShouldUpdateChargeTimes 
+            || context.NewChargeStartTime > context.NewChargeEndTime)
         {
             return false;
         }
