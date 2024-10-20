@@ -21,6 +21,6 @@ public interface IChargingHandler
     /// </summary>
     /// <param name="context">The context containing the necessary data.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task HandleAsync(HandlerContext context);
+    void Handle(HandlerContext context);
 }
 

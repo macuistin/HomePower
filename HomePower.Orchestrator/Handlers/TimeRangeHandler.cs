@@ -5,23 +5,23 @@
 /// </summary>
 public class TimeRangeHandler : IChargingHandler
 {
-    public int Order => 1;
-
     private IChargingHandler _next = NoHandler.Instance;
+
+    public int Order => 1;
 
     public void SetNext(IChargingHandler nextHandler)
     {
         _next = nextHandler;
     }
 
-    public async Task HandleAsync(HandlerContext context)
+    public void Handle(HandlerContext context)
     {
-        if (context.CurrentTime < context.HouseChargeWindowStart || context.CurrentTime >= context.HouseChargeWindowEnd)
+        if (context.CurrentTime < context.Settings.HouseChargeWindowStart || context.CurrentTime >= context.Settings.HouseChargeWindowEnd)
         {
             // Do nothing
             return;
         }
 
-        await _next.HandleAsync(context);
+        _next.Handle(context);
     }
 }

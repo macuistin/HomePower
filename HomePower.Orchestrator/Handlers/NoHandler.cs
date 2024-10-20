@@ -1,6 +1,6 @@
 ﻿namespace HomePower.Orchestrator.Handlers;
 
-internal class NoHandler : IChargingHandler
+public class NoHandler : IChargingHandler
 {
     public static readonly NoHandler Instance = new();
 
@@ -8,12 +8,11 @@ internal class NoHandler : IChargingHandler
 
     public void SetNext(IChargingHandler nextHandler)
     {
-        // No-op
+        // Do nothing
     }
 
-    public Task HandleAsync(HandlerContext context)
+    public void Handle(HandlerContext context)
     {
-        // No-op
-        return Task.CompletedTask;
+        // Do nothing
     }
 }

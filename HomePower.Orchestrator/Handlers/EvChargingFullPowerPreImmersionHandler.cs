@@ -2,32 +2,28 @@
 
 namespace HomePower.Orchestrator.Handlers;
 
-/// <summary>
-/// Handler to check the charging status and update the schedule accordingly.
-/// </summary>
 public class EvChargingFullPowerPreImmersionHandler : IChargingHandler
 {
-    public int Order => 4;
-
     private IChargingHandler _next = NoHandler.Instance;
+
+    public int Order => 4;
 
     public void SetNext(IChargingHandler nextHandler)
     {
         _next = nextHandler;
     }
 
-    public async Task HandleAsync(HandlerContext context)
+    public void Handle(HandlerContext context)
     {
         if (context.EvChargeStatus.ChargerStatus == ChargerStatus.Charging
-            && context.EvChargeStatus.ChargeRateWatts > context.EvChargeLowPowerCutOffWatts
-            && context.CurrentTime < context.PreImmersionTime)
+            && context.EvChargeStatus.ChargeRateWatts > context.Settings.EvChargeLowPowerCutOffWatts
+            && context.CurrentTime < context.Settings.PreImmersionTime)
         {
-            await context.GivEnergyService.UpdateBatteryChargeStartTimeAsync(context.HouseChargeWindowStart);
-            await context.GivEnergyService.UpdateBatteryChargeEndTimeAsync(context.PreImmersionTime);
+            context.SetNewChargeTimes(context.Settings.HouseChargeWindowStart, context.Settings.PreImmersionTime);
 
             return;
         }
 
-        await _next.HandleAsync(context);
+        _next.Handle(context);
     }
 }

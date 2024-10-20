@@ -1,8 +1,11 @@
-﻿using HomePower.Orchestrator.Handlers;
+﻿using HomePower.GivEnergy.Service;
+using HomePower.MyEnergi.Service;
+using HomePower.Orchestrator.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace HomePower.Orchestrator;
+
 public static class ServiceCollectionExtensions
 {
     /// <summary>
@@ -21,8 +24,21 @@ public static class ServiceCollectionExtensions
             services.AddTransient(typeof(IChargingHandler), handlerType);
         }
 
-        services.AddSingleton<ITimeProvider, TimeProvider>();
-        services.AddTransient<IHomeChargerOrchestrator, HomeChargerOrchestrator>();
+        services
+            .AddTransient<IChargingHandlerChainBuilder, ChargingHandlerChainBuilder>()
+            .AddSingleton<ITimeProvider, TimeProvider>()
+            .AddTransient<IHomeChargerOrchestrator, HomeChargerOrchestrator>(sp => 
+            { 
+                var ges = sp.GetRequiredService<IGivEnergyService>();
+                var mes = sp.GetRequiredService<IMyEnergiService>();
+                var tp = sp.GetRequiredService<ITimeProvider>();
+                var cp = sp.GetRequiredService<IChargingHandlerChainBuilder>();
+
+                var firstHandler = cp.BuildChain();
+
+                return new HomeChargerOrchestrator(ges, mes, tp, firstHandler);
+            });
+
 
         return services;
     }

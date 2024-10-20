@@ -1,27 +1,27 @@
 ﻿using HomePower.MyEnergi.Model;
 
 namespace HomePower.Orchestrator.Handlers;
-internal class EvNotChargingHandler : IChargingHandler
-{
-    public int Order => 2;
 
+public class EvNotChargingHandler : IChargingHandler
+{
     private IChargingHandler _next = NoHandler.Instance;
+
+    public int Order => 2;
 
     public void SetNext(IChargingHandler nextHandler)
     {
         _next = nextHandler;
     }
 
-    public async Task HandleAsync(HandlerContext context)
+    public void Handle(HandlerContext context)
     {
         if (context.EvChargeStatus.ChargerStatus != ChargerStatus.Charging)
         {
-            await context.GivEnergyService.UpdateBatteryChargeStartTimeAsync(context.HouseChargeWindowStart);
-            await context.GivEnergyService.UpdateBatteryChargeEndTimeAsync(context.HouseChargeWindowEnd);
+            context.SetNewChargeTimes(context.Settings.HouseChargeWindowStart, context.Settings.HouseChargeWindowEnd);
 
             return;
         }
 
-        await _next.HandleAsync(context);
+        _next.Handle(context);
     }
 }

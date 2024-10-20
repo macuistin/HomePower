@@ -70,7 +70,7 @@ namespace HomePower.Orchestrator.IntegrationTests
             var result = await homeChargerOrchestrator.UpdateChargingScheduleAsync();
 
             // Assert
-            Assert.True(result);
+            Assert.False(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
             _myEnergiServiceMock.VerifyNoOtherCalls();
             _givEnergyServiceMock.VerifyNoOtherCalls();
@@ -124,7 +124,7 @@ namespace HomePower.Orchestrator.IntegrationTests
             var result = await homeChargerOrchestrator.UpdateChargingScheduleAsync();
 
             // Assert
-            Assert.True(result);
+            Assert.False(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
             _givEnergyServiceMock.VerifyNoOtherCalls();
         }
@@ -204,7 +204,7 @@ namespace HomePower.Orchestrator.IntegrationTests
             var result = await homeChargerOrchestrator.UpdateChargingScheduleAsync();
 
             // Assert
-            Assert.True(result);
+            Assert.False(result);
             _myEnergiServiceMock.Verify(m => m.GetEvChargeStatusAsync(), Times.Once);
             _givEnergyServiceMock.VerifyNoOtherCalls();
         }
