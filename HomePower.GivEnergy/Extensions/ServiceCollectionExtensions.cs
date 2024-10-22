@@ -1,12 +1,15 @@
-﻿using HomePower.GivEnergy.Service;
+﻿using HomePower.GivEnergy.Client;
+using HomePower.GivEnergy.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 
-namespace HomePower.GivEnergy;
+namespace HomePower.GivEnergy.Extensions;
 
 /// <summary>
 /// Provides extension methods for adding GivEnergy dependencies to the service collection.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
     /// <summary>
@@ -18,8 +21,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGivEnergyDependencies(this IServiceCollection services, GivEnergySettings settings)
     {
         services.AddSingleton(settings)
+            .AddScoped<IGivEnergyClient, GivEnergyClient>()
             .AddScoped<IGivEnergyService, GivEnergyService>()
-            .AddHttpClient<IGivEnergyService, GivEnergyService>(c =>
+            .AddHttpClient<IGivEnergyClient, GivEnergyClient>(c =>
             {
                 c.BaseAddress = new Uri(settings.BaseUrl);
                 c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.ApiBearer);

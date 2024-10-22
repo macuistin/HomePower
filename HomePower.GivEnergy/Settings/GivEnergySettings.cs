@@ -1,4 +1,4 @@
-﻿namespace HomePower.GivEnergy;
+﻿namespace HomePower.GivEnergy.Settings;
 
 /// <summary>
 /// Represents the settings for GivEnergy API integration.

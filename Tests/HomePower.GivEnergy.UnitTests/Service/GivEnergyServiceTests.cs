@@ -1,204 +1,244 @@
-﻿using HomePower.GivEnergy;
+﻿using HomePower.GivEnergy.Client;
 using HomePower.GivEnergy.Dto;
-using HomePower.GivEnergy.Service;
 using Moq;
-using Moq.Protected;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using Xunit;
 
-namespace HomePower.GivEnergy.UnitTests.Service;
-
-public class GivEnergyServiceTests
+namespace HomePower.GivEnergy.UnitTests.Service
 {
-    private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
-    private readonly HttpClient _httpClient;
-
-    public GivEnergyServiceTests()
+    public class GivEnergyServiceTests
     {
-        _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
-        _httpClient = new HttpClient(_httpMessageHandlerMock.Object)
+        private readonly Mock<IGivEnergyClient> _givEnergyClientMock;
+
+        public GivEnergyServiceTests()
         {
-            BaseAddress = new Uri("http://mockaddress/")
-        };
-    }
+            _givEnergyClientMock = new Mock<IGivEnergyClient>();
+        }
 
-    private GivEnergyService CreateService()
-    {
-        return new GivEnergyService(
-            _httpClient,
-            new GivEnergySettings() { InverterSerialNumber = "serial", ApiBearer = "Bearer", BaseUrl = "http://baseurl" });
-    }
-
-    [Fact]
-    public async Task GetBatteryChargeStartTimeAsync_ReturnsCorrectTime()
-    {
-        // Arrange
-        var settingResponseDto = new SettingResponseDto<string>
+        private GivEnergyService CreateService()
         {
-            Data = new SettingDataDto<string> { Value = "08:00" }
-        };
-        ConfigureHttpGetResponseCreated(settingResponseDto);
+            return new GivEnergyService(_givEnergyClientMock.Object);
+        }
 
-        var service = CreateService();
-
-        // Act
-        var result = await service.GetBatteryChargeStartTimeAsync();
-
-        // Assert
-        Assert.Equal("08:00", result.ToString("HH:mm"));
-    }
-
-    [Fact]
-    public async Task GetBatteryChargeStartTimeAsync_ReturnsEmptyString_OnFailure()
-    {
-        // Arrange
-        ConfigureHttpGetResponseFail(HttpStatusCode.InternalServerError);
-
-        var service = CreateService();
-
-        // Act
-        var result = await service.GetBatteryChargeStartTimeAsync();
-
-        // Assert
-        Assert.Equal(default, result);
-    }
-
-    [Fact]
-    public async Task GetBatteryChargeEndTimeAsync_ReturnsCorrectTime()
-    {
-        // Arrange
-        var settingResponseDto = new SettingResponseDto<string>
+        [Fact]
+        public async Task GetACChargeEnabledAsync_ShouldReturnTrue_WhenACChargeIsEnabled()
         {
-            Data = new SettingDataDto<string> { Value = "20:00" }
-        };
-        ConfigureHttpGetResponseCreated(settingResponseDto);
+            // Arrange
+            var service = CreateService();
+            _givEnergyClientMock
+                .Setup(m => m.GetSettingAsync<bool>(It.IsAny<InverterSettingId>()))
+                .ReturnsAsync(SettingResponseDto<bool>.CreateSuccess(true));
 
-        var service = CreateService();
+            // Act
+            var result = await service.GetACChargeEnabledAsync();
 
-        // Act
-        var result = await service.GetBatteryChargeEndTimeAsync();
+            // Assert
+            Assert.True(result);
+            _givEnergyClientMock.Verify(m => m.GetSettingAsync<bool>(It.IsAny<InverterSettingId>()), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
 
-        // Assert
-        Assert.Equal("20:00", result.ToString("HH:mm"));
-    }
-
-    [Fact]
-    public async Task GetBatteryChargeEndTimeAsync_ReturnsEmptyString_OnFailure()
-    {
-        // Arrange
-        ConfigureHttpGetResponseFail(HttpStatusCode.InternalServerError);
-
-        var service = CreateService();
-
-        // Act
-        var result = await service.GetBatteryChargeEndTimeAsync();
-
-        // Assert
-        Assert.Equal(default, result);
-    }
-
-    [Fact]
-    public async Task GetACChargeEnabledAsync_ReturnsTrue()
-    {
-        // Arrange
-        var settingResponseDto = new SettingResponseDto<bool>
+        [Fact]
+        public async Task GetBatteryChargeStartTime1Async_ShouldReturnExpectedTime_WhenCalled()
         {
-            Data = new SettingDataDto<bool> { Value = true }
-        };
-        ConfigureHttpGetResponseCreated(settingResponseDto);
+            // Arrange
+            var service = CreateService();
+            var expectedTime = new TimeOnly(8, 0);
+            _givEnergyClientMock
+                .Setup(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge1StartTime))
+                .ReturnsAsync(SettingResponseDto<TimeOnly>.CreateSuccess(expectedTime));
 
-        var service = CreateService();
+            // Act
+            var result = await service.GetBatteryChargeStartTime1Async();
 
-        // Act
-        var result = await service.GetACChargeEnabledAsync();
+            // Assert
+            Assert.Equal(expectedTime, result);
+            _givEnergyClientMock.Verify(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge1StartTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
 
-        // Assert
-        Assert.True(result);
+        [Fact]
+        public async Task GetBatteryChargeEndTime1Async_ShouldReturnExpectedTime_WhenCalled()
+        {
+            // Arrange
+            var service = CreateService();
+            var expectedTime = new TimeOnly(10, 0);
+            _givEnergyClientMock
+                .Setup(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge1EndTime))
+                .ReturnsAsync(SettingResponseDto<TimeOnly>.CreateSuccess(expectedTime));
+
+            // Act
+            var result = await service.GetBatteryChargeEndTime1Async();
+
+            // Assert
+            Assert.Equal(expectedTime, result);
+            _givEnergyClientMock.Verify(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge1EndTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task GetBatteryChargeStartTime2Async_ShouldReturnExpectedTime_WhenCalled()
+        {
+            // Arrange
+            var service = CreateService();
+            var expectedTime = new TimeOnly(12, 0);
+            _givEnergyClientMock
+                .Setup(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge2StartTime))
+                .ReturnsAsync(SettingResponseDto<TimeOnly>.CreateSuccess(expectedTime));
+
+            // Act
+            var result = await service.GetBatteryChargeStartTime2Async();
+
+            // Assert
+            Assert.Equal(expectedTime, result);
+            _givEnergyClientMock.Verify(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge2StartTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task GetBatteryChargeEndTime2Async_ShouldReturnExpectedTime_WhenCalled()
+        {
+            // Arrange
+            var service = CreateService();
+            var expectedTime = new TimeOnly(14, 0);
+            _givEnergyClientMock
+                .Setup(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge2EndTime))
+                .ReturnsAsync(SettingResponseDto<TimeOnly>.CreateSuccess(expectedTime));
+
+            // Act
+            var result = await service.GetBatteryChargeEndTime2Async();
+
+            // Assert
+            Assert.Equal(expectedTime, result);
+            _givEnergyClientMock.Verify(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge2EndTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task GetBatteryChargeStartTime3Async_ShouldReturnExpectedTime_WhenCalled()
+        {
+            // Arrange
+            var service = CreateService();
+            var expectedTime = new TimeOnly(16, 0);
+            _givEnergyClientMock
+                .Setup(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge3StartTime))
+                .ReturnsAsync(SettingResponseDto<TimeOnly>.CreateSuccess(expectedTime));
+
+            // Act
+            var result = await service.GetBatteryChargeStartTime3Async();
+
+            // Assert
+            Assert.Equal(expectedTime, result);
+            _givEnergyClientMock.Verify(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge3StartTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task GetBatteryChargeEndTime3Async_ShouldReturnExpectedTime_WhenCalled()
+        {
+            // Arrange
+            var service = CreateService();
+            var expectedTime = new TimeOnly(18, 0);
+            _givEnergyClientMock
+                .Setup(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge3EndTime))
+                .ReturnsAsync(SettingResponseDto<TimeOnly>.CreateSuccess(expectedTime));
+
+            // Act
+            var result = await service.GetBatteryChargeEndTime3Async();
+
+            // Assert
+            Assert.Equal(expectedTime, result);
+            _givEnergyClientMock.Verify(m => m.GetSettingAsync<TimeOnly>(InverterSettingId.ACCharge3EndTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateACChargeEnabledAsync_ShouldReturnTrue_WhenUpdateIsSuccessful()
+        {
+            // Arrange
+            var service = CreateService();
+            bool enabled = true;
+            _givEnergyClientMock
+                .Setup(m => m.UpdateSettingAsync(InverterSettingId.ACChargeEnable, enabled))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await service.UpdateACChargeEnabledAsync(enabled);
+
+            // Assert
+            Assert.True(result);
+            _givEnergyClientMock.Verify(m => m.UpdateSettingAsync(InverterSettingId.ACChargeEnable, enabled), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateACCharge1TimesAsync_ShouldReturnTrue_WhenUpdateIsSuccessful()
+        {
+            // Arrange
+            var service = CreateService();
+            TimeOnly startTime = new(8, 0);
+            TimeOnly endTime = new(10, 0);
+            _givEnergyClientMock
+                .Setup(m => m.UpdateSettingAsync(InverterSettingId.ACCharge1StartTime, startTime))
+                .ReturnsAsync(true);
+            _givEnergyClientMock
+                .Setup(m => m.UpdateSettingAsync(InverterSettingId.ACCharge1EndTime, endTime))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await service.UpdateACCharge1TimesAsync(startTime, endTime);
+
+            // Assert
+            Assert.True(result);
+            _givEnergyClientMock.Verify(m => m.UpdateSettingAsync(InverterSettingId.ACCharge1StartTime, startTime), Times.Once);
+            _givEnergyClientMock.Verify(m => m.UpdateSettingAsync(InverterSettingId.ACCharge1EndTime, endTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateACCharge2TimesAsync_ShouldReturnTrue_WhenUpdateIsSuccessful()
+        {
+            // Arrange
+            var service = CreateService();
+            TimeOnly startTime = new(12, 0);
+            TimeOnly endTime = new(14, 0);
+            _givEnergyClientMock
+                .Setup(m => m.UpdateSettingAsync(InverterSettingId.ACCharge2StartTime, startTime))
+                .ReturnsAsync(true);
+            _givEnergyClientMock
+                .Setup(m => m.UpdateSettingAsync(InverterSettingId.ACCharge2EndTime, endTime))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await service.UpdateACCharge2TimesAsync(startTime, endTime);
+
+            // Assert
+            Assert.True(result);
+            _givEnergyClientMock.Verify(m => m.UpdateSettingAsync(InverterSettingId.ACCharge2StartTime, startTime), Times.Once);
+            _givEnergyClientMock.Verify(m => m.UpdateSettingAsync(InverterSettingId.ACCharge2EndTime, endTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task UpdateACCharge3TimesAsync_ShouldReturnTrue_WhenUpdateIsSuccessful()
+        {
+            // Arrange
+            var service = CreateService();
+            TimeOnly startTime = new(16, 0);
+            TimeOnly endTime = new(18, 0);
+            _givEnergyClientMock
+                .Setup(m => m.UpdateSettingAsync(InverterSettingId.ACCharge3StartTime, startTime))
+                .ReturnsAsync(true);
+            _givEnergyClientMock
+                .Setup(m => m.UpdateSettingAsync(InverterSettingId.ACCharge3EndTime, endTime))
+                .ReturnsAsync(true);
+
+            // Act
+            var result = await service.UpdateACCharge3TimesAsync(startTime, endTime);
+
+            // Assert
+            Assert.True(result);
+            _givEnergyClientMock.Verify(m => m.UpdateSettingAsync(InverterSettingId.ACCharge3StartTime, startTime), Times.Once);
+            _givEnergyClientMock.Verify(m => m.UpdateSettingAsync(InverterSettingId.ACCharge3EndTime, endTime), Times.Once);
+            _givEnergyClientMock.VerifyNoOtherCalls();
+        }
     }
-
-    [Fact]
-    public async Task GetACChargeEnabledAsync_ReturnsFalse_OnFailure()
-    {
-        // Arrange
-        ConfigureHttpGetResponseFail(HttpStatusCode.InternalServerError);
-
-        var service = CreateService();
-
-        // Act
-        var result = await service.GetACChargeEnabledAsync();
-
-        // Assert
-        Assert.False(result);
-    }
-
-    [Fact]
-    public async Task UpdateBatteryChargeStartTimeAsync_ReturnsTrue()
-    {
-        // Arrange
-        var service = CreateService();
-
-        // Act
-        var result = await service.UpdateBatteryChargeStartTimeAsync(new TimeOnly(8, 0));
-
-        // Assert
-        Assert.True(result);
-    }
-
-    [Fact]
-    public async Task UpdateBatteryChargeEndTimeAsync_ReturnsTrue()
-    {
-        // Arrange
-        var service = CreateService();
-
-        // Act
-        var result = await service.UpdateBatteryChargeEndTimeAsync(new TimeOnly(8, 0));
-
-        // Assert
-        Assert.True(result);
-    }
-
-    [Fact]
-    public async Task UpdateACChargeEnabledAsync_ReturnsTrue()
-    {
-        // Arrange
-        var service = CreateService();
-
-        // Act
-        var result = await service.UpdateACChargeEnabledAsync(true);
-
-        // Assert
-        Assert.True(result);
-    }
-
-
-    #region Helper methods
-    private void ConfigureHttpGetResponseCreated<T>(T content)
-    {
-        _httpMessageHandlerMock.Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created)
-            {
-                Content = JsonContent.Create(content)
-            });
-    }
-
-    private void ConfigureHttpGetResponseFail(HttpStatusCode statusCode)
-    {
-        _httpMessageHandlerMock.Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage(statusCode));
-    }
-    #endregion Helper methods
 }

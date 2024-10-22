@@ -21,6 +21,15 @@ public record SettingResponseDto<T> where T : notnull
         }
     };
 
+    public static SettingResponseDto<T> CreateSuccess(T value) => new()
+    {
+        Success = true,
+        Data = new()
+        {
+            Value = value!
+        }
+    };
+
     /// <summary>
     /// Gets or sets the data of the setting response.
     /// </summary>
@@ -29,5 +38,5 @@ public record SettingResponseDto<T> where T : notnull
     /// <summary>
     /// Gets a value indicating whether the request was successful.
     /// </summary>
-    public bool Success { get; private set; } = true;
+    public required bool Success { get; set; }
 }
