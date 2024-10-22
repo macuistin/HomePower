@@ -1,14 +1,13 @@
 ﻿using HomePower.MyEnergi.Dto;
-using HomePower.MyEnergi.Model;
 using System.Net.Http.Json;
 
-namespace HomePower.MyEnergi.Service;
+namespace HomePower.MyEnergi.Client;
 
 /// <summary>
 /// Provides methods to interact with MyEnergi services.
 /// </summary>
 /// <param name="httpClient">The HTTP client used to make requests to the MyEnergi API.</param>
-public class MyEnergiService(HttpClient _httpClient) : IMyEnergiService
+public class MyEnergiClient(HttpClient _httpClient) : IMyEnergiClient
 {
     /// <inheritdoc/>
     public async Task<ZappiStatusResult> GetZappiStatusAsync()
@@ -24,16 +23,5 @@ public class MyEnergiService(HttpClient _httpClient) : IMyEnergiService
             return ZappiStatusResult.Failed;
 
         return ZappiStatusResult.CreateSuccess(responseDto.Zappi.First());
-    }
-
-    /// <inheritdoc/>
-    public async Task<EvChargeStatus> GetEvChargeStatusAsync()
-    {
-        var zappiStatus = await GetZappiStatusAsync();
-
-        if (zappiStatus.Success)
-            return zappiStatus.Zappi.ToEvChargeStatus();
-
-        return EvChargeStatus.Failed;
     }
 }

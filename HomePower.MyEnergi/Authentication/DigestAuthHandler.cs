@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,6 +9,7 @@ namespace HomePower.MyEnergi.Authentication;
 /// <summary>
 /// A message handler that performs HTTP Digest Authentication.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DigestAuthHandler : DelegatingHandler
 {
     private readonly string _username;
@@ -62,7 +64,7 @@ public class DigestAuthHandler : DelegatingHandler
     /// </summary>
     /// <param name="challenge">The challenge string from the WWW-Authenticate header.</param>
     /// <returns>A <see cref="DigestChallenge"/> object containing the parsed values.</returns>
-    private static DigestChallenge ParseDigestChallenge(string challenge)
+    internal static DigestChallenge ParseDigestChallenge(string challenge)
     {
         var digestChallenge = new DigestChallenge();
 
@@ -104,7 +106,7 @@ public class DigestAuthHandler : DelegatingHandler
     /// <param name="httpMethod">The HTTP method (e.g., GET, POST).</param>
     /// <param name="uri">The request URI.</param>
     /// <returns>The Digest response header value.</returns>
-    private string CreateDigestResponse(DigestChallenge challenge, string httpMethod, string uri)
+    internal string CreateDigestResponse(DigestChallenge challenge, string httpMethod, string uri)
     {
         var ha1 = CalculateMD5Hash($"{_username}:{challenge.Realm}:{_password}");
         var ha2 = CalculateMD5Hash($"{httpMethod}:{uri}");
@@ -173,7 +175,7 @@ public class DigestAuthHandler : DelegatingHandler
     /// Clones the specified <see cref="HttpRequestMessage"/>.
     /// </summary>
     /// <param name="request">The request message to clone.</param>
-    /// <returns>A cloned <see cref="HttpRequestMessage"/>.</returns>
+    /// <returns>A cloned <see cref="HttpRequestMessage"/>.</returns>    
     private static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage request)
     {
         var clone = new HttpRequestMessage(request.Method, request.RequestUri);

@@ -1,126 +1,113 @@
-﻿using HomePower.MyEnergi.Dto;
+﻿using HomePower.MyEnergi.Client;
+using HomePower.MyEnergi.Dto;
 using HomePower.MyEnergi.Model;
-using HomePower.MyEnergi.Service;
 using Moq;
-using Moq.Protected;
-using System.Net;
-using System.Net.Http.Json;
 
-namespace HomePower.MyEnergi.UnitTests.Service;
-
-public class MyEnergiServiceTests
+namespace HomePower.MyEnergi.UnitTests.Service
 {
-    private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
-    private readonly HttpClient _httpClient;
-
-    public MyEnergiServiceTests()
+    public class MyEnergiServiceTests
     {
-        _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
-        _httpClient = new HttpClient(_httpMessageHandlerMock.Object)
+        private readonly Mock<IMyEnergiClient> _myEnergiClientMock;
+
+        public MyEnergiServiceTests()
         {
-            BaseAddress = new Uri("http://mockaddress/")
-        };
-    }
+            _myEnergiClientMock = new Mock<IMyEnergiClient>();
+        }
 
-    private MyEnergiService CreateService()
-    {
-        return new MyEnergiService(_httpClient);
-    }
-
-    [Fact]
-    public async Task GetZappiStatusAsync_ReturnsSuccess()
-    {
-        // Arrange
-        var zappiStatusDto = new ZappiStatusDto
+        private MyEnergiService CreateService()
         {
-            Zappi = [new ZappiDto ()]
-        };
+            return new MyEnergiService(_myEnergiClientMock.Object);
+        }
 
-        ConfigureHttpGetResponseOk(zappiStatusDto);
-
-        var service = CreateService();
-
-        // Act
-        var result = await service.GetZappiStatusAsync();
-
-        // Assert
-        Assert.True(result.Success);
-    }
-
-    [Fact]
-    public async Task GetZappiStatusAsync_ReturnsFailed_OnHttpError()
-    {
-        // Arrange
-        ConfigureHttpGetResponseFail(HttpStatusCode.InternalServerError);
-
-        var service = CreateService();
-
-        // Act
-        var result = await service.GetZappiStatusAsync();
-
-        // Assert
-        Assert.False(result.Success);
-    }
-
-    [Fact]
-    public async Task GetEvChargeStatus_ReturnsSuccess()
-    {
-        // Arrange
-        var zappiStatusDto = new ZappiStatusDto
+        [Fact]
+        public async Task GetEvChargeStatusAsync_ShouldReturnEvChargeStatus_WhenZappiStatusIsSuccessful()
         {
-            Zappi = [new ZappiDto()]
-        };
-
-        ConfigureHttpGetResponseOk(zappiStatusDto);
-
-        var service = CreateService();
-
-        // Act
-        var result = await service.GetEvChargeStatusAsync();
-
-        // Assert
-        Assert.NotEqual(EvChargeStatus.Failed, result);
-    }
-
-    [Fact]
-    public async Task GetEvChargeStatus_ReturnsFailed_OnZappiStatusFailed()
-    {
-        // Arrange
-        ConfigureHttpGetResponseFail(HttpStatusCode.InternalServerError);
-
-        var service = CreateService();
-
-        // Act
-        var result = await service.GetEvChargeStatusAsync();
-
-        // Assert
-        Assert.Equal(EvChargeStatus.Failed, result);
-    }
-
-    #region Helper methods
-    private void ConfigureHttpGetResponseOk(ZappiStatusDto content)
-    {
-        _httpMessageHandlerMock.Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+            // Arrange
+            var zappiStatus = ZappiStatusResult.CreateSuccess(new ZappiDto
             {
-                Content = JsonContent.Create(content)
+                ChargingStatus = 3, // Diverting/Charging
+                ChargerStatus = "B1", // EV Connected
+                ChargeRateWatts = 1000,
             });
-    }
+            _myEnergiClientMock
+                .Setup(m => m.GetZappiStatusAsync())
+                .ReturnsAsync(zappiStatus);
+            var service = CreateService();
 
-    private void ConfigureHttpGetResponseFail(HttpStatusCode statusCode)
-    {
-        _httpMessageHandlerMock.Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage(statusCode));
+            // Act
+            var result = await service.GetEvChargeStatusAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(1000, result.ChargeRateWatts);
+            Assert.Equal(ChargerStatus.EvConnected, result.ChargerStatus);
+            Assert.Equal(ChargingStatus.Diverting_Charging, result.ChargingStatus);
+        }
+
+        [Fact]
+        public async Task GetEvChargeStatusAsync_ShouldReturnFailedStatus_WhenZappiStatusIsNotSuccessful()
+        {
+            // Arrange
+            _myEnergiClientMock
+                .Setup(m => m.GetZappiStatusAsync())
+                .ReturnsAsync(ZappiStatusResult.Failed);
+            var service = CreateService();
+
+            // Act
+            var result = await service.GetEvChargeStatusAsync();
+
+            // Assert
+            Assert.Equal(EvChargeStatus.Failed, result);
+        }
+
+        [Fact]
+        public async Task GetEvChargeStatusAsync_ShouldReturnCorrectStatus_WhenChargingStatusIsUnknown()
+        {
+            // Arrange
+            var zappiStatus = ZappiStatusResult.CreateSuccess(new ZappiDto
+            {
+                ChargingStatus = 1, // Paused
+                ChargerStatus = "ZZZ", // Does not exist
+                ChargeRateWatts = 0,
+            });
+            _myEnergiClientMock
+                .Setup(m => m.GetZappiStatusAsync())
+                .ReturnsAsync(zappiStatus);
+            var service = CreateService();
+
+            // Act
+            var result = await service.GetEvChargeStatusAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(0, result.ChargeRateWatts);
+            Assert.Equal(ChargerStatus.Unknown, result.ChargerStatus);
+            Assert.Equal(ChargingStatus.Paused, result.ChargingStatus);
+        }
+
+        [Fact]
+        public async Task GetEvChargeStatusAsync_ShouldReturnCorrectStatus_WhenChargerStatusIsDifferent()
+        {
+            // Arrange
+            var zappiStatus = ZappiStatusResult.CreateSuccess(new ZappiDto
+            {
+                ChargingStatus = 3, // Diverting/Charging
+                ChargerStatus = "C1", // EV ready
+                ChargeRateWatts = 2000,
+            });
+            _myEnergiClientMock
+                .Setup(m => m.GetZappiStatusAsync())
+                .ReturnsAsync(zappiStatus);
+            var service = CreateService();
+
+            // Act
+            var result = await service.GetEvChargeStatusAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(2000, result.ChargeRateWatts);
+            Assert.Equal(ChargerStatus.EvReady, result.ChargerStatus);
+            Assert.Equal(ChargingStatus.Diverting_Charging, result.ChargingStatus);
+        }
     }
-    #endregion Helper methods
 }

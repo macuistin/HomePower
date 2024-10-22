@@ -1,9 +1,13 @@
 ﻿using HomePower.MyEnergi.Dto;
+using HomePower.MyEnergi.Model;
+using System.Diagnostics.CodeAnalysis;
 
-namespace HomePower.MyEnergi.Model;
+namespace HomePower.MyEnergi.Extensions;
+
+[ExcludeFromCodeCoverage]
 internal static class MappingExtensions
 {
-    public static EvChargeStatus ToEvChargeStatus(this ZappiDto zappi)
+    internal static EvChargeStatus ToEvChargeStatus(this ZappiDto zappi)
     {
         return new EvChargeStatus
         {

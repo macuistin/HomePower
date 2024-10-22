@@ -1,4 +1,5 @@
-﻿namespace HomePower.MyEnergi.Authentication;
+﻿
+namespace HomePower.MyEnergi.Authentication;
 
 /// <summary>
 /// Represents the Digest challenge parameters.
