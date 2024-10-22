@@ -1,6 +1,7 @@
-﻿using HomePower.GivEnergy.Service;
-using HomePower.MyEnergi.Service;
-using HomePower.Orchestrator.Handlers;
+﻿using HomePower.GivEnergy;
+using HomePower.MyEnergi;
+using HomePower.MyEnergi.Model;
+using HomePower.Orchestrator.Settings;
 
 namespace HomePower.Orchestrator;
 
@@ -16,68 +17,35 @@ namespace HomePower.Orchestrator;
 /// <exception cref="InvalidOperationException">Thrown when duplicate Order values are found in handlers.</exception>
 public class HomeChargerOrchestrator(
     IGivEnergyService _givEnergyService,
-    IMyEnergiService _myEnergiService, 
-    ITimeProvider _timeProvider,
-    IChargingHandler _firstHandler,
+    IMyEnergiService _myEnergiService,
     OrchestratorSettings _settings) : IHomeChargerOrchestrator
 {
     /// <inheritdoc/>
     public async Task<bool> UpdateChargingScheduleAsync()
     {
-        HandlerContext context = await CreateHandlerContextAsync();
-
-        _firstHandler.Handle(context);
-
-        return await UpdateChargerTimesAsync(context);
-    }
-
-    private async Task<HandlerContext> CreateHandlerContextAsync()
-    {
         var evChargeStatus = await _myEnergiService.GetEvChargeStatusAsync();
-
-        var context = new HandlerContext
-        {
-            Settings = _settings,
-            EvChargeStatus = evChargeStatus,
-            CurrentTime = _timeProvider.GetCurrentTime()
-        };
-
-        return context;
+        
+        var highLoadExpectedForImmersion = evChargeStatus?.ChargerStatus == ChargerStatus.Charging
+            && (evChargeStatus?.ChargeRateWatts ?? 0) > _settings.EvChargeLowPowerCutOffWatts;
+        
+        return highLoadExpectedForImmersion
+            ? await UpdateChargeSchedulePreAndPostImmersionAsync()
+            : await UpdateChargeScheduleToFullWindow();
     }
 
-    private async Task<bool> UpdateChargerTimesAsync(HandlerContext context)
+    private async Task<bool> UpdateChargeScheduleToFullWindow()
     {
-        if (!context.ShouldUpdateChargeTimes 
-            || context.NewChargeStartTime > context.NewChargeEndTime)
-        {
-            return false;
-        }
+        var updated1 = await _givEnergyService.UpdateACCharge1TimesAsync(_settings.HouseChargeWindowStart, _settings.HouseChargeWindowEnd);
+        var updated2 = await _givEnergyService.UpdateACCharge2TimesAsync(TimeOnly.MinValue, TimeOnly.MinValue);
 
-        await UpdateChargerStartTimeAsync(context);
-        await UpdateChargerEndTimeAsync(context);
-
-        return context.ChargeTimesUpdated;
+        return updated1 || updated2;
     }
 
-    private async Task UpdateChargerStartTimeAsync(HandlerContext context)
+    private async Task<bool> UpdateChargeSchedulePreAndPostImmersionAsync()
     {
-        var currentChargerStartTime = await _givEnergyService.GetBatteryChargeStartTimeAsync();
+        var updated1 = await _givEnergyService.UpdateACCharge1TimesAsync(_settings.HouseChargeWindowStart, _settings.PreImmersionTime);
+        var updated2 = await _givEnergyService.UpdateACCharge2TimesAsync(_settings.PostImmersionTime, _settings.HouseChargeWindowEnd);
 
-        if (context.NewChargeStartTime != currentChargerStartTime)
-        {
-            await _givEnergyService.UpdateBatteryChargeStartTimeAsync(context.NewChargeStartTime);
-            context.ChargeTimesUpdated = true;
-        }
-    }
-
-    private async Task UpdateChargerEndTimeAsync(HandlerContext context)
-    {
-        var currentChargerEndTime = await _givEnergyService.GetBatteryChargeEndTimeAsync();
-
-        if (context.NewChargeEndTime != currentChargerEndTime)
-        {
-            await _givEnergyService.UpdateBatteryChargeEndTimeAsync(context.NewChargeEndTime);
-            context.ChargeTimesUpdated = true;
-        }
+        return updated1 || updated2;
     }
 }

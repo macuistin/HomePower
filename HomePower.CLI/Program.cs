@@ -1,9 +1,12 @@
 ﻿using HomePower.GivEnergy;
-using HomePower.GivEnergy.Service;
+using HomePower.GivEnergy.Extensions;
+using HomePower.GivEnergy.Settings;
 using HomePower.MyEnergi;
-using HomePower.MyEnergi.Service;
+using HomePower.MyEnergi.Extensions;
 using HomePower.MyEnergi.Settings;
 using HomePower.Orchestrator;
+using HomePower.Orchestrator.Extensions;
+using HomePower.Orchestrator.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -33,8 +36,8 @@ async Task Demo1(MyEnergiSettings meSettings, GivEnergySettings geSettings)
 
     var givEnergyService = sp.GetService<IGivEnergyService>();
     var acChargeEnabled = await givEnergyService.GetACChargeEnabledAsync();
-    var chargeStartTime = await givEnergyService.GetBatteryChargeStartTimeAsync();
-    var chargeEndTime = await givEnergyService.GetBatteryChargeEndTimeAsync();
+    var chargeStartTime = await givEnergyService.GetBatteryChargeStartTime1Async();
+    var chargeEndTime = await givEnergyService.GetBatteryChargeEndTime1Async();
 
     Console.WriteLine($"House Battery Charger\n Enabled: {acChargeEnabled}, Start: {chargeStartTime}, End: {chargeEndTime}");
 
