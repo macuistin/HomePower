@@ -58,9 +58,7 @@ async Task Demo2(MyEnergiSettings meSettings, GivEnergySettings geSettings, Orch
 {
     var services = new ServiceCollection();
     var sp = services
-        .AddGivEnergyDependencies(geSettings!)
-        .AddMyEnergiDependencies(meSettings!)
-        .AddOrchestratorServices(orchestratorSettings)
+        .AddOrchestratorServices(orchestratorSettings, meSettings, geSettings)
         .BuildServiceProvider();
 
     var orchestrator = sp.GetService<IHomeChargerOrchestrator>();

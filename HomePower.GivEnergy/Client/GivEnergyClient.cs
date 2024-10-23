@@ -1,5 +1,6 @@
 ﻿using HomePower.GivEnergy.Dto;
 using HomePower.GivEnergy.Settings;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 
 namespace HomePower.GivEnergy.Client;
@@ -9,7 +10,7 @@ namespace HomePower.GivEnergy.Client;
 /// </summary>
 /// <param name="_httpClient">The HTTP client used to make requests to the GivEnergy API.</param>
 /// <param name="_settings">The settings for GivEnergy integration.</param>
-public class GivEnergyClient(HttpClient _httpClient, GivEnergySettings _settings) : IGivEnergyClient
+public class GivEnergyClient(ILogger<GivEnergyClient> _logger, HttpClient _httpClient, GivEnergySettings _settings) : IGivEnergyClient
 {
     const string ApiContext = "HomePower automation";
 
@@ -47,14 +48,23 @@ public class GivEnergyClient(HttpClient _httpClient, GivEnergySettings _settings
         return responseDto ?? SettingResponseDto<T>.Failed;
     }
 
-    public async Task<bool> UpdateSettingAsync<T>(InverterSettingId settingId, TimeOnly value)
+    public async Task<bool> UpdateTimeSettingAsync<T>(InverterSettingId settingId, TimeOnly value)
         => await  UpdateSettingAsync(settingId, $"{value:HH:mm}");
 
     public async Task<bool> UpdateSettingAsync<T>(InverterSettingId settingId, T value)
         where T : notnull
-        => await UpdateSettingAsync((int)settingId, value);
+    {
+        _logger.LogTrace("Updating setting: {InverterSettingId}, value: {Value}", settingId, value);        
+        if (await UpdateSettingAsync((int)settingId, value))
+        {
+            _logger.LogInformation("Setting updated successfully: {InverterSettingId}, value: {Value}", settingId, value);
+            return true;
+        }
+        _logger.LogWarning("Failed to update setting: {InverterSettingId}, value: {Value}", settingId, value);
+        return false;
+    }
 
-    public async Task<bool> UpdateSettingAsync<T>(int settingId, T value)
+    private async Task<bool> UpdateSettingAsync<T>(int settingId, T value)
         where T : notnull
     {
         var apiPath = $"/v1/inverter/{_settings.InverterSerialNumber}/settings/{(int)settingId}/write";

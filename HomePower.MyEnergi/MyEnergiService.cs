@@ -1,6 +1,7 @@
 ﻿using HomePower.MyEnergi.Client;
 using HomePower.MyEnergi.Extensions;
 using HomePower.MyEnergi.Model;
+using Microsoft.Extensions.Logging;
 
 namespace HomePower.MyEnergi;
 

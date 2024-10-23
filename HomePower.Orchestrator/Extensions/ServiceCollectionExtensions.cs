@@ -1,4 +1,8 @@
-﻿using HomePower.Orchestrator.Settings;
+﻿using HomePower.GivEnergy.Extensions;
+using HomePower.GivEnergy.Settings;
+using HomePower.MyEnergi.Extensions;
+using HomePower.MyEnergi.Settings;
+using HomePower.Orchestrator.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 
@@ -12,10 +16,17 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
     /// <param name="settings">Orchestrator settings.</param>
     [ExcludeFromCodeCoverage]
-    public static IServiceCollection AddOrchestratorServices(this IServiceCollection services, OrchestratorSettings settings)
+    public static IServiceCollection AddOrchestratorServices(
+        this IServiceCollection services, 
+        OrchestratorSettings orchestratorSettings,
+        MyEnergiSettings meSettings, 
+        GivEnergySettings geSettings)
     {
+        
         services
-            .AddSingleton(settings)
+            .AddSingleton(orchestratorSettings)
+            .AddMyEnergiDependencies(meSettings)
+            .AddGivEnergyDependencies(geSettings)
             .AddTransient<IHomeChargerOrchestrator, HomeChargerOrchestrator>();
 
         return services;

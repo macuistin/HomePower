@@ -1,4 +1,5 @@
 ﻿using HomePower.GivEnergy.Client;
+using Microsoft.Extensions.Logging;
 
 namespace HomePower.GivEnergy;
 
@@ -83,33 +84,48 @@ public class GivEnergyService(IGivEnergyClient _client) : IGivEnergyService
     /// <inheritdoc/>
     public async Task<bool> UpdateACCharge1TimesAsync(TimeOnly startTime, TimeOnly endTime)
     {
-        // Need to add logging here
-        var startTimeSuccess = await _client.UpdateSettingAsync(InverterSettingId.ACCharge1StartTime, startTime);
-        if (!startTimeSuccess)
+        if (!await _client.UpdateSettingAsync(InverterSettingId.ACCharge1StartTime, startTime))
+        {
             return false;
+        }
 
-        return await _client.UpdateSettingAsync(InverterSettingId.ACCharge1EndTime, endTime);
+        if (!await _client.UpdateSettingAsync(InverterSettingId.ACCharge1EndTime, endTime))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>
     public async Task<bool> UpdateACCharge2TimesAsync(TimeOnly startTime, TimeOnly endTime)
     {
-        // Need to add logging here
-        var startTimeSuccess = await _client.UpdateSettingAsync(InverterSettingId.ACCharge2StartTime, startTime);
-        if (!startTimeSuccess)
+        if (!await _client.UpdateSettingAsync(InverterSettingId.ACCharge2StartTime, startTime))
+        {
             return false;
+        }
 
-        return await _client.UpdateSettingAsync(InverterSettingId.ACCharge2EndTime, endTime);
+        if (!await _client.UpdateSettingAsync(InverterSettingId.ACCharge2EndTime, endTime))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>
     public async Task<bool> UpdateACCharge3TimesAsync(TimeOnly startTime, TimeOnly endTime)
     {
-        // Need to add logging here
-        var startTimeSuccess = await _client.UpdateSettingAsync(InverterSettingId.ACCharge3StartTime, startTime);
-        if (!startTimeSuccess)
+        if (!await _client.UpdateSettingAsync(InverterSettingId.ACCharge3StartTime, startTime))
+        {
             return false;
+        }
 
-        return await _client.UpdateSettingAsync(InverterSettingId.ACCharge3EndTime, endTime);
+        if (!await _client.UpdateSettingAsync(InverterSettingId.ACCharge3EndTime, endTime))
+        {
+            return false;
+        }
+
+        return true;
     }
 }

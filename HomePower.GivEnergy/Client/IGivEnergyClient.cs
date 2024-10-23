@@ -10,9 +10,7 @@ public interface IGivEnergyClient
     Task<SettingResponseDto<T>> GetSettingAsync<T>(InverterSettingId settingId)
         where T : notnull;
 
-    Task<bool> UpdateSettingAsync<T>(InverterSettingId settingId, TimeOnly value);
-    Task<bool> UpdateSettingAsync<T>(int settingId, T value)
-        where T : notnull;
+    Task<bool> UpdateTimeSettingAsync<T>(InverterSettingId settingId, TimeOnly value);
     Task<bool> UpdateSettingAsync<T>(InverterSettingId settingId, T value)
         where T : notnull;
 }
